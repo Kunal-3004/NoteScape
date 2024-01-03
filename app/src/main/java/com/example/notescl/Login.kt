@@ -1,0 +1,75 @@
+package com.example.notescl
+
+import android.app.Activity
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.util.Log
+import android.util.Patterns
+import android.widget.Toast
+import com.example.notescl.databinding.ActivityLoginBinding
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+
+class Login : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var binding: ActivityLoginBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        auth = Firebase.auth
+
+        binding.LoginButton.setOnClickListener {
+            val email=binding.Email.text.toString()
+            val password=binding.Password.text.toString()
+            if(checkAllField()){
+                auth.signInWithEmailAndPassword(email,password).addOnCompleteListener {
+                    if(it.isSuccessful){
+                        Toast.makeText(this,"Successfully Login", Toast.LENGTH_SHORT).show()
+                        val intent= Intent(this,MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }
+                    else{
+                        Log.e("error",it.exception.toString())
+                    }
+                }
+            }
+        }
+        binding.CreateAccountButton.setOnClickListener{
+            val intent = Intent(this,SignUp::class.java)
+            startActivity(intent)
+            finish()
+        }
+        binding.ForgotPassword.setOnClickListener{
+            val intent = Intent(this,ForgotPassword::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    private fun checkAllField(): Boolean{
+        val email=binding.Email.text.toString()
+        if(email==""){
+            binding.Email.error="This is a required field"
+            return false
+        }
+        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            binding.Email.error="Check email format"
+            return false
+        }
+        if(binding.Password.text.toString()==""){
+            binding.Password.error="This is a required field"
+            return false
+        }
+        if(binding.Password.length() <= 6) {
+            binding.Password.error = "Password should atleast 8 characters long"
+            return false
+        }
+        return true
+    }
+}

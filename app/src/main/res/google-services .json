@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "193152759718",
+    "project_id": "notescl",
+    "storage_bucket": "notescl.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:193152759718:android:70b285eefc7a1823bd8167",
+        "android_client_info": {
+          "package_name": "com.example.notescl"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVElydathoLoLleH252k6goptxpQMwBSg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
