@@ -36,7 +36,8 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
 
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var noteAdapter: NoteAdapter
-    private lateinit var auth: FirebaseAuth
+    private lateinit var auth:FirebaseAuth
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,8 +46,6 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
         // Inflate the layout for this fragment
         homeBinding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
-        auth = Firebase.auth
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -127,6 +126,8 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.signOut ->{
+                auth= FirebaseAuth.getInstance()
+                auth.signOut()
                 val intent = Intent(requireContext(), Login::class.java)
                 startActivity(intent)
                 true

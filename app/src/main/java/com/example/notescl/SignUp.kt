@@ -34,7 +34,7 @@ class SignUp : AppCompatActivity() {
                         finish()
                     }
                     else{
-                        Log.e("error",it.exception.toString())
+                        Toast.makeText(this,"Account already exist!", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

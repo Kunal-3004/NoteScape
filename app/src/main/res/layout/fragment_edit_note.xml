@@ -51,6 +51,12 @@
             android:autofillHints=""
             android:inputType="text" />
 
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/noteImg"
+            android:background="@drawable/border"
+            android:layout_below="@id/editNoteTitle"/>
         <EditText
             android:id="@+id/editNoteDesc"
             android:layout_width="match_parent"

@@ -1,5 +1,7 @@
 package com.example.notescl.fragments
 
+import android.app.AlertDialog
+import android.icu.text.DateFormat
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -19,6 +22,9 @@ import com.example.notescl.R
 import com.example.notescl.databinding.FragmentAddNoteBinding
 import com.example.notescl.model.Note
 import com.example.notescl.viewModel.NoteViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -38,7 +44,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
        addNoteBinding=FragmentAddNoteBinding.inflate(inflater,container,false)
         return binding.root
 
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,9 +57,11 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
     private fun saveNote(view: View){
         val noteTitle=binding.addNoteTitle.text.toString().trim()
         val noteContent=binding.addNoteDesc.text.toString().trim()
+        val d=Date()
+        val notesDate:CharSequence=android.text.format.DateFormat.format("MMMM d,yyyy",d.time)
 
         if(noteTitle.isNotEmpty()){
-            val note= Note(0,noteTitle,noteContent)
+            val note= Note(0,noteTitle,noteContent,notesDate.toString())
             noteViewModel.addNote(note)
 
             Toast.makeText(addNoteView.context,"Note Saved",Toast.LENGTH_SHORT).show()

@@ -38,7 +38,6 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
       editNoteBinding=FragmentEditNoteBinding.inflate(inflater,container,false)
         return binding.root
     }
@@ -54,13 +53,16 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
 
         binding.editNoteTitle.setText(currentNote.title)
         binding.editNoteDesc.setText(currentNote.content)
+        binding.updateNoteDate.setText(currentNote.date)
 
         binding.editNoteFab.setOnClickListener{
             val noteTitle=binding.editNoteTitle.text.toString().trim()
             val noteContent=binding.editNoteDesc.text.toString().trim()
+            val d=Date()
+            val notesDate:CharSequence=android.text.format.DateFormat.format("MMMM d,yyyy",d.time)
 
             if(noteTitle.isNotEmpty()){
-                val note= Note(0,noteTitle,noteContent)
+                val note= Note(0,noteTitle,noteContent,notesDate.toString())
                 noteViewModel.updateNote(note)
                 view.findNavController().popBackStack(R.id.homeFragment,false)
             }
