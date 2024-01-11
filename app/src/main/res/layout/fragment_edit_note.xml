@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -18,30 +16,46 @@
             android:layout_alignParentTop="true"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/poppins"
-            android:text="Edit Note"
+            android:text="@string/edit_note"
             android:textStyle="bold"
             android:textColor="@color/orange"
             android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/updateNoteDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
+            android:background="@drawable/border"
+            android:fontFamily="@font/poppins"
+            android:hint="@string/date"
+            android:padding="5dp"
+            android:textColorHint="@color/grey"
+            android:textSize="15sp"
+            android:autofillHints=""
+            android:inputType="datetime" />
 
         <EditText
             android:id="@+id/editNoteTitle"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:hint="Note Title"
+            android:hint="@string/note_title1"
             android:textColorHint="@color/grey"
             android:padding="12dp"
             android:textSize="20sp"
             android:layout_below="@id/editNoteHeading"
             android:background="@drawable/border"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="46dp"
             android:maxLines="1"
-            android:fontFamily="@font/poppins"/>
+            android:fontFamily="@font/poppins"
+            android:autofillHints=""
+            android:inputType="text" />
 
         <EditText
             android:id="@+id/editNoteDesc"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Note Content..."
+            android:hint="@string/note_content2"
             android:textColorHint="@color/grey"
             android:gravity="top"
             android:padding="12dp"
@@ -49,7 +63,9 @@
             android:fontFamily="@font/poppins"
             android:background="@drawable/border"
             android:layout_below="@id/editNoteTitle"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="12dp"
+            android:autofillHints=""
+            android:inputType="textMultiLine" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/editNoteFab"
@@ -63,7 +79,8 @@
             android:src="@drawable/baseline_done_24"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:contentDescription="editFab" />
+            android:contentDescription="@string/editfab"
+            android:focusable="true" />
 
     </RelativeLayout>
 </layout>

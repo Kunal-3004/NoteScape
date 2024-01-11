@@ -8,5 +8,9 @@
         android:title="Search"
         app:showAsAction="ifRoom"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
+    <item
+        android:id="@+id/signOut"
+        android:title="Sign out"
+        app:showAsAction="always"/>
 
 </menu>

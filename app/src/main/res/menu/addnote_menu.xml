@@ -5,5 +5,9 @@
         android:id="@+id/Save_menu"
         android:title="Save"
         app:showAsAction="always"/>
+    <item android:id="@+id/addImage"
+        android:title="Image"
+        android:icon="@drawable/baseline_image_24"
+        app:showAsAction="always"/>
 
 </menu>

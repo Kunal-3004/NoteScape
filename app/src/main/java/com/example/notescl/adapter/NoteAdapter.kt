@@ -9,10 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.notescl.databinding.NoteLayoutBinding
 import com.example.notescl.fragments.HomeFragmentDirections
 import com.example.notescl.model.Note
+import java.text.SimpleDateFormat
+import java.util.logging.SimpleFormatter
 
 class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
     class NoteViewHolder(val itemBinding:NoteLayoutBinding):RecyclerView.ViewHolder(itemBinding.root)
+
 
     private val differCallBack=object :DiffUtil.ItemCallback<Note>(){
         override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
@@ -44,6 +47,7 @@ class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
         holder.itemBinding.noteTitle.text=currentNote.title
         holder.itemBinding.noteDesc.text=currentNote.content
+
 
         holder.itemView.setOnClickListener{
             val direction=HomeFragmentDirections.actionHomeFragmentToEditNoteFragment(currentNote)

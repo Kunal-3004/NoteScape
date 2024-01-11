@@ -8,6 +8,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -18,6 +19,8 @@ import com.example.notescl.R
 import com.example.notescl.databinding.FragmentAddNoteBinding
 import com.example.notescl.model.Note
 import com.example.notescl.viewModel.NoteViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
@@ -32,9 +35,10 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
        addNoteBinding=FragmentAddNoteBinding.inflate(inflater,container,false)
         return binding.root
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,6 +65,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         }
     }
 
+
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
       menu.clear()
         menuInflater.inflate(R.menu.addnote_menu,menu)
@@ -80,4 +85,5 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         super.onDestroy()
         addNoteBinding=null
     }
+
 }

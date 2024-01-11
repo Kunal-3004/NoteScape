@@ -21,4 +21,17 @@
     <string name="passwords">Password</string>
     <string name="emailjj">Email</string>
     <string name="sign_up">SIGN UP</string>
+    <string name="note_titlew3">Note Title</string>
+    <string name="todo2">TODO</string>
+    <string name="image">image</string>
+    <string name="add_note">Add Note</string>
+    <string name="note_content">Note Content...</string>
+    <string name="edit_note">Edit Note</string>
+    <string name="note_title1">Note Title</string>
+    <string name="note_content2">Note Content...</string>
+    <string name="editfab">editFab</string>
+    <string name="by_n_developer_kunal">By\n Developer Kunal</string>
+    <string name="life_is_too_short_don_t_forget_anything_just_n_note_it">Life is too short don\'t forget anything just\n Note it!</string>
+    <string name="register">Register</string>
+    <string name="date">Date</string>
 </resources>

@@ -20,6 +20,8 @@ import com.example.notescl.R
 import com.example.notescl.databinding.FragmentEditNoteBinding
 import com.example.notescl.model.Note
 import com.example.notescl.viewModel.NoteViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
@@ -35,7 +37,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
       editNoteBinding=FragmentEditNoteBinding.inflate(inflater,container,false)
         return binding.root
@@ -49,6 +51,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
         noteViewModel=(activity as MainActivity).noteViewModel
         currentNote=args.note!!
 
+
         binding.editNoteTitle.setText(currentNote.title)
         binding.editNoteDesc.setText(currentNote.content)
 
@@ -57,7 +60,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
             val noteContent=binding.editNoteDesc.text.toString().trim()
 
             if(noteTitle.isNotEmpty()){
-                val note=Note(currentNote.id,noteTitle,noteContent)
+                val note= Note(0,noteTitle,noteContent)
                 noteViewModel.updateNote(note)
                 view.findNavController().popBackStack(R.id.homeFragment,false)
             }

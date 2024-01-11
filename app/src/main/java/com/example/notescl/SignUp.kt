@@ -8,6 +8,7 @@ import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
 import com.example.notescl.databinding.ActivitySignUpBinding
+import com.example.notescl.fragments.HomeFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -27,9 +28,8 @@ class SignUp : AppCompatActivity() {
             if(checkAllField()){
                 auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener{
                     if(it.isSuccessful){
-                        auth.signOut()
                         Toast.makeText(this,"Account created successfully!", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this,Login::class.java)
+                        val intent = Intent(this,MainActivity::class.java)
                         startActivity(intent)
                         finish()
                     }

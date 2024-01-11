@@ -2,6 +2,7 @@ package com.example.notescl
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.notescl.database.NoteDatabase
 import com.example.notescl.repository.NoteRepository
@@ -11,12 +12,15 @@ import com.example.notescl.viewModel.NoteViewModelFactory
 class MainActivity : AppCompatActivity() {
 
     lateinit var noteViewModel: NoteViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         setupViewModel()
     }
+
+
     private fun setupViewModel(){
         val noteRepository=NoteRepository(NoteDatabase(this))
         val viewModelProviderFactory=NoteViewModelFactory(application,noteRepository)

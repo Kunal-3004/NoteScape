@@ -18,6 +18,17 @@
             android:padding="16dp">
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/noteDate"
+                android:maxHeight="170dp"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/grey"
+                android:fontFamily="@font/poppins"
+                android:text="Date"
+                android:textSize="15sp"/>
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:id="@+id/noteTitle"
@@ -27,6 +38,7 @@
                 android:text="@string/note_title"
                 android:textStyle="bold"
                 android:textSize="18sp"/>
+
 
             <TextView
                 android:layout_width="match_parent"
@@ -38,6 +50,8 @@
                 android:textSize="14sp"
                 android:fontFamily="@font/poppins"
                 android:textColor="@color/black"/>
+
+
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

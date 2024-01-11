@@ -17,12 +17,13 @@
             android:layout_marginBottom="30dp"
             android:backgroundTint="@color/Lavendar"
             android:clickable="true"
-            android:contentDescription="image"
+            android:contentDescription="@string/image"
             android:tintMode="@color/white"
             app:maxImageSize="35dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:srcCompat="@drawable/baseline_add_24" />
+            app:srcCompat="@drawable/baseline_add_24"
+            android:focusable="true" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/homeRecyclerView"
@@ -39,7 +40,8 @@
             android:layout_height="match_parent"
             android:id="@+id/emptyNotesImage"
             android:visibility="gone"
-            android:src="@drawable/empty_notes"/>
+            android:src="@drawable/empty_notes"
+            android:contentDescription="@string/todo2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
