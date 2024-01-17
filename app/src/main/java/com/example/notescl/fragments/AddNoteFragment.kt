@@ -1,8 +1,10 @@
 package com.example.notescl.fragments
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.icu.text.DateFormat
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -25,6 +27,8 @@ import com.example.notescl.viewModel.NoteViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.yahiaangelo.markdownedittext.MarkdownEditText
+import com.yahiaangelo.markdownedittext.MarkdownStylesBar
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -44,6 +48,8 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
        addNoteBinding=FragmentAddNoteBinding.inflate(inflater,container,false)
         return binding.root
 
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -53,6 +59,9 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
 
         noteViewModel=(activity as MainActivity).noteViewModel
         addNoteView=view
+
+
+
     }
     private fun saveNote(view: View){
         val noteTitle=binding.addNoteTitle.text.toString().trim()
@@ -92,5 +101,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         super.onDestroy()
         addNoteBinding=null
     }
+
+
 
 }

@@ -16,6 +16,7 @@ class Login : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var binding: ActivityLoginBinding
+    var firstPressTime:Long=0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,5 +72,13 @@ class Login : AppCompatActivity() {
             return false
         }
         return true
+    }
+    override fun onBackPressed() {
+        if(firstPressTime+1000>System.currentTimeMillis()){
+            super.onBackPressed()
+        }else{
+            Toast.makeText(baseContext,"Press Back Twice to Exit", Toast.LENGTH_SHORT).show()
+        }
+        firstPressTime=System.currentTimeMillis()
     }
 }
