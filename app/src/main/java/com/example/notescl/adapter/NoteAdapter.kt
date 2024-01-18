@@ -1,7 +1,11 @@
 package com.example.notescl.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
+import androidx.lifecycle.LiveData
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -12,7 +16,12 @@ import com.example.notescl.model.Note
 import java.text.SimpleDateFormat
 import java.util.logging.SimpleFormatter
 
-class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
+class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(),Filterable {
+
+    private var originalList: List<Note> = mutableListOf()
+
+
+
 
     class NoteViewHolder(val itemBinding:NoteLayoutBinding):RecyclerView.ViewHolder(itemBinding.root)
 
@@ -55,4 +64,34 @@ class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
             it.findNavController().navigate(direction)
         }
     }
+
+    fun submitListAndFilter(newList: List<Note>) {
+        originalList = newList
+        differ.submitList(newList)
+        notifyDataSetChanged()
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val filteredResults = if (constraint.isNullOrBlank()) {
+                    originalList
+                } else {
+                    originalList.filter {
+                        it.title.contains(constraint, true) || it.content.contains(constraint, true)
+                    }
+                }
+
+                val results = FilterResults()
+                results.values = filteredResults
+                return results
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+                differ.submitList(results?.values as List<Note>)
+                notifyDataSetChanged()
+            }
+        }
+    }
 }
+

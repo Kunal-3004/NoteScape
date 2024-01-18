@@ -5,6 +5,7 @@ import android.content.Intent
 import android.icu.text.DateFormat
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -27,10 +28,14 @@ import com.example.notescl.viewModel.NoteViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.yahiaangelo.markdownedittext.MarkdownEditText
 import com.yahiaangelo.markdownedittext.MarkdownStylesBar
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Objects
+import java.util.UUID
 
 
 class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
@@ -41,14 +46,14 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var addNoteView: View
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
        addNoteBinding=FragmentAddNoteBinding.inflate(inflater,container,false)
         return binding.root
-
-
 
     }
 
@@ -60,24 +65,26 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         noteViewModel=(activity as MainActivity).noteViewModel
         addNoteView=view
 
+        val markdownEditText=binding.addNoteDesc
+        val stylusBar= binding.styleBar
+        markdownEditText.setStylesBar(stylusBar)
 
 
     }
-    private fun saveNote(view: View){
-        val noteTitle=binding.addNoteTitle.text.toString().trim()
-        val noteContent=binding.addNoteDesc.text.toString().trim()
-        val d=Date()
-        val notesDate:CharSequence=android.text.format.DateFormat.format("MMMM d,yyyy",d.time)
+    private fun saveNote(view: View) {
+        val noteTitle = binding.addNoteTitle.text.toString().trim()
+        val noteContent = binding.addNoteDesc.text.toString().trim()
+        val d = Date()
+        val notesDate: CharSequence = android.text.format.DateFormat.format("MMMM d,yyyy", d.time)
 
-        if(noteTitle.isNotEmpty()){
-            val note= Note(0,noteTitle,noteContent,notesDate.toString())
+        if (noteTitle.isNotEmpty()) {
+            val note = Note(0, noteTitle, noteContent, notesDate.toString())
             noteViewModel.addNote(note)
-
             Toast.makeText(addNoteView.context,"Note Saved",Toast.LENGTH_SHORT).show()
-            view.findNavController().popBackStack(R.id.homeFragment,false)
+            view.findNavController().popBackStack(R.id.homeFragment, false)
         }
         else{
-            Toast.makeText(addNoteView.context,"Please write a Note title",Toast.LENGTH_SHORT).show()
+            Toast.makeText(addNoteView.context, "Please write a Note title", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -91,17 +98,47 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         return when(menuItem.itemId){
             R.id.Save_menu->{
                 saveNote(addNoteView)
+                addNoteToFirestore()
                 true
             }
             else->false
         }
     }
+    private fun addNoteToFirestore() {
+        val noteTitle = binding.addNoteTitle.text.toString().trim()
+        val noteContent = binding.addNoteDesc.text.toString().trim()
+        val d = Date()
+        val notesDate: CharSequence = android.text.format.DateFormat.format("MMMM d,yyyy", d.time)
+
+        if (noteTitle.isNotEmpty()) {
+            val user = FirebaseAuth.getInstance().currentUser
+            val userId = user?.uid
+            if (userId != null) {
+                val noteMap = mapOf(
+                    "title" to noteTitle,
+                    "content" to noteContent,
+                    "date" to notesDate.toString(),
+                    "userId" to userId
+                )
+                val dbFireStore = FirebaseFirestore.getInstance()
+                dbFireStore.collection("notes")
+                    .add(noteMap)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d(
+                            "Firestore",
+                            "Note added successfully. Document ID: ${documentReference.id}"
+                        )
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("Firestore", "Error adding note to Firestore: ${e.message}", e)
+                    }
+            }
+        }
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
         addNoteBinding=null
     }
-
-
-
 }

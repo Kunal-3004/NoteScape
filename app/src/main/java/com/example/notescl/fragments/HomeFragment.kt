@@ -2,6 +2,7 @@ package com.example.notescl.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -10,6 +11,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -25,11 +28,13 @@ import com.example.notescl.model.Note
 import com.example.notescl.viewModel.NoteViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 
 
-class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextListener,MenuProvider {
+class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextListener,MenuProvider{
 
     private var homeBinding: FragmentHomeBinding? = null
     private val binding get() = homeBinding!!
@@ -37,6 +42,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var auth:FirebaseAuth
+
 
 
     override fun onCreateView(
@@ -56,13 +62,14 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
 
         noteViewModel = (activity as MainActivity).noteViewModel
         setupRecyclerView()
+        noteViewModel.retrieveUserNotes()
+
 
         binding.addNoteFab.setOnClickListener {
             it.findNavController().navigate(R.id.action_homeFragment_to_addNoteFragment)
         }
 
     }
-
     private fun updateUI(note: List<Note>?) {
         if (note != null) {
             if (note.isNotEmpty()) {
@@ -78,6 +85,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
 
     private fun setupRecyclerView() {
         noteAdapter = NoteAdapter()
+
         binding.homeRecyclerView.apply {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
@@ -85,7 +93,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
         }
         activity?.let {
             noteViewModel.getAllNotes().observe(viewLifecycleOwner) { note ->
-                noteAdapter.differ.submitList(note)
+                noteAdapter.submitListAndFilter(note)
                 updateUI(note)
             }
         }
@@ -93,19 +101,22 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
 
     private fun searchNote(query: String?) {
         val searchQuery = "%$query"
-        noteViewModel.searchNotes(searchQuery).observe(this) { list ->
-            noteAdapter.differ.submitList(list)
+        val filteredList = if (query.isNullOrBlank()) {
+            noteAdapter.differ.currentList
+        } else {
+            noteViewModel.searchNotes(searchQuery).value ?: emptyList()
         }
+
+        noteAdapter.submitListAndFilter(filteredList)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
+        noteAdapter.filter.filter(query)
         return false
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        if (newText != null) {
-            searchNote(newText)
-        }
+        noteAdapter.filter.filter(newText)
         return true
     }
 
@@ -130,6 +141,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
                 auth.signOut()
                 val intent = Intent(requireContext(), Login::class.java)
                 startActivity(intent)
+                noteViewModel.signOutAndClearData()
                 true
             }
             else -> false

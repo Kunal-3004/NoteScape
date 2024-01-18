@@ -64,6 +64,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
             if(noteTitle.isNotEmpty()){
                 val note= Note(0,noteTitle,noteContent,notesDate.toString())
                 noteViewModel.updateNote(note)
+                noteViewModel.updateNoteInFirestore(note)
                 view.findNavController().popBackStack(R.id.homeFragment,false)
             }
             else{

@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.example.notescl.databinding.ActivityLoginBinding
+import com.example.notescl.viewModel.NoteViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -17,6 +19,8 @@ class Login : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var binding: ActivityLoginBinding
     var firstPressTime:Long=0
+
+    private lateinit var noteViewModel: NoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +38,7 @@ class Login : AppCompatActivity() {
                         val intent= Intent(this,MainActivity::class.java)
                         startActivity(intent)
                         finish()
+                        noteViewModel.retrieveUserNotes()
                     }
                     else{
                         Log.e("error",it.exception.toString())

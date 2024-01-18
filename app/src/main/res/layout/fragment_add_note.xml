@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:context=".AddNoteFragment"
         android:padding="12dp">
@@ -55,10 +59,10 @@
             android:layout_marginEnd="10dp"
             android:id="@+id/imgNote"/>
 
-        <EditText
+        <com.yahiaangelo.markdownedittext.MarkdownEditText
             android:id="@+id/addNoteDesc"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:hint="@string/note_content"
             android:fontFamily="@font/poppins"
             android:gravity="top"
@@ -69,9 +73,18 @@
             android:layout_marginTop="12dp"
             android:autofillHints=""
             android:inputType="textMultiLine" />
-
-
     </RelativeLayout>
+    <com.yahiaangelo.markdownedittext.MarkdownStylesBar
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/styleBar"
+        android:gravity="center|bottom"
+        android:layout_marginStart="30dp"
+        android:elevation="5dp"
+        android:padding="0dp">
+
+    </com.yahiaangelo.markdownedittext.MarkdownStylesBar>
+    </LinearLayout>
 
 
 
