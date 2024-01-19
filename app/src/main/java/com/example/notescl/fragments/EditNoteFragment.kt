@@ -20,6 +20,7 @@ import com.example.notescl.R
 import com.example.notescl.databinding.FragmentEditNoteBinding
 import com.example.notescl.model.Note
 import com.example.notescl.viewModel.NoteViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -61,8 +62,11 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
             val d=Date()
             val notesDate:CharSequence=android.text.format.DateFormat.format("MMMM d,yyyy",d.time)
 
+            val user = FirebaseAuth.getInstance().currentUser
+            val userId = user?.uid
+
             if(noteTitle.isNotEmpty()){
-                val note= Note(0,noteTitle,noteContent,notesDate.toString())
+                val note= Note(0,noteTitle,noteContent,notesDate.toString(),userId)
                 noteViewModel.updateNote(note)
                 noteViewModel.updateNoteInFirestore(note)
                 view.findNavController().popBackStack(R.id.homeFragment,false)

@@ -1,7 +1,6 @@
 package com.example.notescl.viewModel
 
 import android.app.Application
-import android.app.DownloadManager.Query
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -13,7 +12,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
-class NoteViewModel(app: Application, private val noteRepository: NoteRepository): AndroidViewModel(app) {
+class NoteViewModel(application: Application, noteRepository: NoteRepository) : AndroidViewModel(application) {
+    private val noteRepository: NoteRepository = NoteRepository(application)
+    val dbFireStore = FirebaseFirestore.getInstance()
 
 
     fun addNote(note: Note) =
@@ -37,7 +38,7 @@ class NoteViewModel(app: Application, private val noteRepository: NoteRepository
     }
 
 
-    fun getAllNotes() = noteRepository.getAllNotes()
+    fun getAllNotes(): LiveData<List<Note>> = noteRepository.getAllNotes()
     fun searchNotes(query: String?) = noteRepository.searchNote(query)
 
     private val _notes = MutableLiveData<List<Note>>()
@@ -45,13 +46,15 @@ class NoteViewModel(app: Application, private val noteRepository: NoteRepository
         _notes.value = notesList
     }
 
+
+
     fun updateNoteInFirestore(note: Note) = viewModelScope.launch {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
-            val dbFireStore = FirebaseFirestore.getInstance()
             val noteDocument = dbFireStore.collection("notes").document(note.id.toString())
-
+            val noteId = noteDocument.id
             val updatedNote = mapOf(
+                "id" to noteId,
                 "title" to note.title,
                 "content" to note.content,
                 "date" to note.date
@@ -72,7 +75,6 @@ class NoteViewModel(app: Application, private val noteRepository: NoteRepository
         val user = FirebaseAuth.getInstance().currentUser
         if(user!=null){
             val userId = user.uid
-            val dbFireStore = FirebaseFirestore.getInstance()
             dbFireStore.collection("notes")
                 .whereEqualTo("userId", userId)
                 .get()
@@ -82,12 +84,14 @@ class NoteViewModel(app: Application, private val noteRepository: NoteRepository
                         val title = document.getString("title")
                         val content = document.getString("content")
                         val date = document.getString("date")
+                        val documentUserId = document.getString("userId")
 
                         val note = Note(
                             0,
                             title ?: "",
                             content ?: "",
-                            date ?: ""
+                            date ?: "",
+                            documentUserId
                         )
                         userNotes.add(note)
                     }

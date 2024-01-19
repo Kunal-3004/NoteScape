@@ -1,17 +1,21 @@
 package com.example.notescl.repository
 
+import android.app.Application
+import android.content.Context
 import com.example.notescl.database.NoteDatabase
 import com.example.notescl.model.Note
 
-class NoteRepository(private val db:NoteDatabase) {
+class NoteRepository(context: Context) {
 
-    suspend fun insertNote(note: Note)=db.getNoteDao().insertNote(note)
-    suspend fun deleteNote(note: Note)=db.getNoteDao().deleteNote(note)
-    suspend fun updateNote(note: Note)=db.getNoteDao().updateNote(note)
+    // Initialize the database using the provided context
+    private val noteDao = NoteDatabase.invoke(context.applicationContext).getNoteDao()
 
-    suspend fun deleteAllNotes()=db.getNoteDao().deleteAllNotes()
+    suspend fun insertNote(note: Note) = noteDao.insertNote(note)
+    suspend fun deleteNote(note: Note) = noteDao.deleteNote(note)
+    suspend fun updateNote(note: Note) = noteDao.updateNote(note)
 
+    suspend fun deleteAllNotes() = noteDao.deleteAllNotes()
 
-    fun getAllNotes()=db.getNoteDao().getAllNotes()
-    fun searchNote(query:String?)=db.getNoteDao().searchNote("%$query%")
+    fun getAllNotes() = noteDao.getAllNotes()
+    fun searchNote(query: String?) = noteDao.searchNote("%$query%")
 }

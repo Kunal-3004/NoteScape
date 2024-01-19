@@ -77,11 +77,15 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         val d = Date()
         val notesDate: CharSequence = android.text.format.DateFormat.format("MMMM d,yyyy", d.time)
 
+        val user = FirebaseAuth.getInstance().currentUser
+        val userId = user?.uid
+
         if (noteTitle.isNotEmpty()) {
-            val note = Note(0, noteTitle, noteContent, notesDate.toString())
+            val note = Note(0, noteTitle, noteContent, notesDate.toString(),userId)
             noteViewModel.addNote(note)
             Toast.makeText(addNoteView.context,"Note Saved",Toast.LENGTH_SHORT).show()
             view.findNavController().popBackStack(R.id.homeFragment, false)
+
         }
         else{
             Toast.makeText(addNoteView.context, "Please write a Note title", Toast.LENGTH_SHORT).show()

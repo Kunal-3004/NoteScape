@@ -2,7 +2,6 @@ package com.example.notescl
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.notescl.database.NoteDatabase
 import com.example.notescl.repository.NoteRepository
@@ -27,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setupViewModel(){
-        val noteRepository=NoteRepository(NoteDatabase(this))
+        val noteRepository=NoteRepository(this)
         val viewModelProviderFactory=NoteViewModelFactory(application,noteRepository)
         noteViewModel=ViewModelProvider(this,viewModelProviderFactory)[NoteViewModel::class.java]
     }
