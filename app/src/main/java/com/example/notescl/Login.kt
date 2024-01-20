@@ -41,8 +41,9 @@ class Login : AppCompatActivity() {
             if(checkAllField()){
                 auth.signInWithEmailAndPassword(email,password).addOnCompleteListener {
                     if(it.isSuccessful){
-                        noteViewModel.retrieveUserNotes()
                         Toast.makeText(this,"Successfully Login", Toast.LENGTH_SHORT).show()
+                         //noteViewModel.retrieveUserNotes()
+
                         val intent= Intent(this,MainActivity::class.java)
                         startActivity(intent)
                         finish()

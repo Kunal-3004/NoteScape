@@ -20,7 +20,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         setupViewModel()
-        noteViewModel.retrieveUserNotes()
         FirebaseApp.initializeApp(this)
     }
 

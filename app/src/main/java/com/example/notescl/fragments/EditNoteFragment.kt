@@ -2,6 +2,7 @@ package com.example.notescl.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -17,11 +18,13 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.notescl.MainActivity
 import com.example.notescl.R
+import com.example.notescl.adapter.NoteAdapter
 import com.example.notescl.databinding.FragmentEditNoteBinding
 import com.example.notescl.model.Note
+import com.example.notescl.repository.NoteRepository
 import com.example.notescl.viewModel.NoteViewModel
 import com.google.firebase.auth.FirebaseAuth
-import java.text.SimpleDateFormat
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Date
 
 
@@ -32,6 +35,8 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
 
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var currentNote: Note
+    private lateinit var noteRepository: NoteRepository
+    private lateinit var noteAdapter: NoteAdapter
 
     private val args:EditNoteFragmentArgs by navArgs()
 
@@ -47,6 +52,8 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
         super.onViewCreated(view, savedInstanceState)
         val menuHost: MenuHost =requireActivity()
         menuHost.addMenuProvider(this,viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        noteAdapter=NoteAdapter()
 
         noteViewModel=(activity as MainActivity).noteViewModel
         currentNote=args.note!!
@@ -82,6 +89,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
             setMessage("Do you want to delete this note?")
             setPositiveButton("Delete"){_,_->
                 noteViewModel.deleteNote(currentNote)
+                noteViewModel.deleteNoteAndFirestore(currentNote)
                 Toast.makeText(context,"Note Deleted",Toast.LENGTH_SHORT).show()
                 view?.findNavController()?.popBackStack(R.id.homeFragment,false)
             }

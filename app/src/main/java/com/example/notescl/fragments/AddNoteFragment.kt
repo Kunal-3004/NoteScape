@@ -1,10 +1,6 @@
 package com.example.notescl.fragments
 
-import android.app.AlertDialog
-import android.content.Intent
-import android.icu.text.DateFormat
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,8 +9,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
@@ -25,17 +19,9 @@ import com.example.notescl.R
 import com.example.notescl.databinding.FragmentAddNoteBinding
 import com.example.notescl.model.Note
 import com.example.notescl.viewModel.NoteViewModel
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
-import com.yahiaangelo.markdownedittext.MarkdownEditText
-import com.yahiaangelo.markdownedittext.MarkdownStylesBar
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Objects
-import java.util.UUID
 
 
 class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
@@ -51,7 +37,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
        addNoteBinding=FragmentAddNoteBinding.inflate(inflater,container,false)
         return binding.root
 
@@ -139,6 +125,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
             }
         }
     }
+
 
 
     override fun onDestroy() {

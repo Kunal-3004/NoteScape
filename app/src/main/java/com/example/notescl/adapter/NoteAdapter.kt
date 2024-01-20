@@ -68,7 +68,6 @@ class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(),Filterable 
     fun submitListAndFilter(newList: List<Note>) {
         originalList = newList
         differ.submitList(newList)
-        notifyDataSetChanged()
     }
 
     override fun getFilter(): Filter {

@@ -48,8 +48,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    ): View {
         homeBinding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -62,7 +61,12 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
 
         noteViewModel = (activity as MainActivity).noteViewModel
         setupRecyclerView()
-        noteViewModel.retrieveUserNotes()
+        //noteViewModel.retrieveUserNotes()
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userId = user.uid
+            noteViewModel.retrieveAndPopulateUserNotes(userId)
+        }
 
 
         binding.addNoteFab.setOnClickListener {
@@ -106,7 +110,6 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
         } else {
             noteViewModel.searchNotes(searchQuery).value ?: emptyList()
         }
-
         noteAdapter.submitListAndFilter(filteredList)
     }
 

@@ -5,12 +5,15 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.example.notescl.model.Note
 import com.example.notescl.repository.NoteRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NoteViewModel(application: Application, noteRepository: NoteRepository) : AndroidViewModel(application) {
     private val noteRepository: NoteRepository = NoteRepository(application)
@@ -57,9 +60,9 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
                 "id" to noteId,
                 "title" to note.title,
                 "content" to note.content,
-                "date" to note.date
+                "date" to note.date,
+                "userId" to note.userId
             )
-
             noteDocument
                 .update(updatedNote)
                 .addOnSuccessListener {
@@ -70,6 +73,9 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
                 }
         }
     }
+
+
+    /*private var isFirestoreRetrieved = false
 
     fun  retrieveUserNotes(){
         val user = FirebaseAuth.getInstance().currentUser
@@ -97,9 +103,29 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
                     }
                     setNotes(userNotes)
                 }
+
                 .addOnFailureListener { e ->
                     Log.e("Firestore", "Error getting notes: ${e.message}", e)
                 }
+            isFirestoreRetrieved=true
+        }
+    }*/
+
+    fun retrieveAndPopulateUserNotes(userId: String) = viewModelScope.launch {
+        noteRepository.retrieveUserNotesFromFirestore(userId)
+        val allNotesObserver = Observer<List<Note>> { notesList ->
+            setNotes(notesList)
+        }
+
+        withContext(Dispatchers.Main) {
+            noteRepository.getAllNotes().observeForever(allNotesObserver)
         }
     }
+
+    fun deleteNoteAndFirestore(note: Note) {
+        viewModelScope.launch {
+            noteRepository.deleteNoteAndFirestore(note)
+        }
+    }
+
 }
