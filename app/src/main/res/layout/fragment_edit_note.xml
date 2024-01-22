@@ -52,11 +52,16 @@
             android:inputType="text" />
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/EditnoteImg"
-            android:background="@drawable/border"
-            android:layout_below="@id/editNoteTitle"/>
+            android:id="@+id/editNoteImg"
+            android:layout_width="wrap_content"
+            android:layout_height="150dp"
+            android:layout_below="@id/editNoteTitle"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:contentDescription="@string/todo77" />
+
         <EditText
             android:id="@+id/editNoteDesc"
             android:layout_width="match_parent"
@@ -68,25 +73,22 @@
             android:textSize="18sp"
             android:fontFamily="@font/poppins"
             android:background="@drawable/border"
-            android:layout_below="@id/editNoteTitle"
+            android:layout_below="@id/editNoteImg"
             android:layout_marginTop="12dp"
             android:autofillHints=""
             android:inputType="textMultiLine" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/editNoteFab"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:clickable="true"
-            android:backgroundTint="@color/Lavendar"
-            android:tintMode="@color/white"
+            android:id="@+id/editNoteFab"
             android:src="@drawable/baseline_done_24"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:contentDescription="@string/editfab"
-            android:focusable="true" />
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="20dp"/>
+
 
     </RelativeLayout>
+
 </layout>

@@ -3,6 +3,8 @@ package com.example.notescl
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.notescl.database.NoteDatabase
 import com.example.notescl.repository.NoteRepository
 import com.example.notescl.viewModel.NoteViewModel
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity() {
 
         setupViewModel()
         FirebaseApp.initializeApp(this)
+        Glide.with(this).applyDefaultRequestOptions(RequestOptions())
     }
 
 

@@ -11,9 +11,13 @@ import com.example.notescl.model.Note
 import com.example.notescl.repository.NoteRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.io.File
+
 
 class NoteViewModel(application: Application, noteRepository: NoteRepository) : AndroidViewModel(application) {
     private val noteRepository: NoteRepository = NoteRepository(application)
@@ -54,28 +58,41 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
     fun updateNoteInFirestore(note: Note) = viewModelScope.launch {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
-            val noteDocument = dbFireStore.collection("notes").document(note.id.toString())
-            val noteId = noteDocument.id
-            val updatedNote = mapOf(
-                "id" to noteId,
-                "title" to note.title,
-                "content" to note.content,
-                "date" to note.date,
-                "userId" to note.userId
-            )
-            noteDocument
-                .update(updatedNote)
-                .addOnSuccessListener {
-                    Log.d("Firestore", "Note updated successfully in Firestore")
+            val noteDocument = dbFireStore.collection("notes").document(note.id)
+
+            noteDocument.get()
+                .addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot.exists()) {
+                        val updatedNote = mapOf(
+                            "id" to note.id,
+                            "title" to note.title,
+                            "content" to note.content,
+                            "date" to note.date,
+                            "userId" to note.userId,
+                            "imagePath" to note.imagePath
+                        )
+
+                        noteDocument
+                            .update(updatedNote)
+                            .addOnSuccessListener {
+                                Log.d("Firestore", "Note updated successfully in Firestore")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Firestore", "Error updating note in Firestore: ${e.message}", e)
+                            }
+                    } else {
+                        Log.e("Firestore", "Document does not exist for note ID: ${note.id}")
+                    }
                 }
                 .addOnFailureListener { e ->
-                    Log.e("Firestore", "Error updating note in Firestore: ${e.message}", e)
+                    Log.e("Firestore", "Failed to check document existence: ${e.message}", e)
                 }
         }
     }
 
 
-    /*private var isFirestoreRetrieved = false
+
+    private var isFirestoreRetrieved = false
 
     fun  retrieveUserNotes(){
         val user = FirebaseAuth.getInstance().currentUser
@@ -87,17 +104,20 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
                 .addOnSuccessListener { result ->
                     val userNotes = mutableListOf<Note>()
                     for (document in result) {
+                        val noteId=document.id
                         val title = document.getString("title")
                         val content = document.getString("content")
                         val date = document.getString("date")
                         val documentUserId = document.getString("userId")
+                        val imagePath = document.getString("imagePath")
 
                         val note = Note(
-                            0,
+                            noteId?:"",
                             title ?: "",
                             content ?: "",
                             date ?: "",
-                            documentUserId
+                            documentUserId,
+                            imagePath
                         )
                         userNotes.add(note)
                     }
@@ -109,7 +129,7 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
                 }
             isFirestoreRetrieved=true
         }
-    }*/
+    }
 
     fun retrieveAndPopulateUserNotes(userId: String) = viewModelScope.launch {
         noteRepository.retrieveUserNotesFromFirestore(userId)
@@ -122,10 +142,22 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
         }
     }
 
-    fun deleteNoteAndFirestore(note: Note) {
+    /*fun deleteNoteAndFirestore(note: Note) {
         viewModelScope.launch {
             noteRepository.deleteNoteAndFirestore(note)
         }
+    }*/
+    fun deleteNoteFromFirestore(noteId: String) {
+        val notesCollection = dbFireStore.collection("notes")
+        val noteDocument = notesCollection.document(noteId)
+
+        noteDocument.delete()
+            .addOnSuccessListener {
+                Log.d("Firestore", "DocumentSnapshot successfully deleted!")
+            }
+            .addOnFailureListener { e ->
+                Log.w("Firestore", "Error deleting document", e)
+            }
     }
 
 }

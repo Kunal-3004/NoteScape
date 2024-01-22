@@ -26,17 +26,29 @@ class NoteRepository(context: Context) {
         noteDao.retrieveUserNotesFromFirestore(userId)
     }
 
-    suspend fun deleteNoteAndFirestore(note: Note) {
+    /*suspend fun deleteNoteAndFirestore(note: Note) {
         deleteNoteFromRoom(note)
 
         deleteNoteFromFirestore(firestore ,note)
-    }
+    }*/
 
-    private suspend fun deleteNoteFromRoom(note: Note) {
+    /*private suspend fun deleteNoteFromRoom(note: Note) {
         noteDao.deleteNote(note)
-    }
-     suspend fun deleteNoteFromFirestore(firestore: FirebaseFirestore,note: Note) {
+    }*/
+     /*suspend fun deleteNoteFromFirestore(firestore: FirebaseFirestore,note: Note) {
         val noteDocument = firestore.collection("notes").document(note.id.toString())
         noteDocument.delete().await()
-    }
+    }*/
+     suspend fun deleteNoteFromFirestore(noteId: String) {
+         val notesCollection = firestore.collection("notes")
+         val noteDocument = notesCollection.document(noteId)
+
+         try {
+             noteDocument.delete().await()
+             Log.d("Firestore", "DocumentSnapshot successfully deleted!")
+         } catch (e: Exception) {
+             Log.w("Firestore", "Error deleting document", e)
+         }
+     }
+
 }

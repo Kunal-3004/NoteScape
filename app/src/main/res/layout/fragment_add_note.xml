@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,40 +48,30 @@
             android:inputType="text" />
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="170dp"
+            android:id="@+id/imgNote"
+            android:layout_width="wrap_content"
+            android:layout_height="150dp"
+            android:layout_below="@id/addNoteTitle"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:id="@+id/imgNote"/>
+            android:visibility="gone"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/todo77" />
 
-        <com.yahiaangelo.markdownedittext.MarkdownEditText
+        <EditText
             android:id="@+id/addNoteDesc"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:hint="@string/note_content"
             android:fontFamily="@font/poppins"
             android:gravity="top"
             android:padding="12dp"
             android:textSize="18sp"
             android:background="@drawable/border"
-            android:layout_below="@id/addNoteTitle"
+            android:layout_below="@id/imgNote"
             android:layout_marginTop="12dp"
             android:autofillHints=""
             android:inputType="textMultiLine" />
     </RelativeLayout>
-    <com.yahiaangelo.markdownedittext.MarkdownStylesBar
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/styleBar"
-        android:gravity="center|bottom"
-        android:layout_marginStart="30dp"
-        android:elevation="5dp"
-        android:padding="0dp">
-
-    </com.yahiaangelo.markdownedittext.MarkdownStylesBar>
-    </LinearLayout>
-
-
 
 </layout>

@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 import com.example.notescl.model.Note
 import java.util.concurrent.locks.Lock
 
-@Database(entities = [Note::class], version = 8)
+@Database(entities = [Note::class], version = 10)
 abstract class NoteDatabase: RoomDatabase(){
 
     abstract fun getNoteDao():NoteDao
@@ -26,7 +26,6 @@ abstract class NoteDatabase: RoomDatabase(){
             }
 
         }
-
         private fun createDatabase(context: Context)=
             Room.databaseBuilder(
                 context.applicationContext,

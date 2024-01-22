@@ -10,6 +10,8 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.notescl.R
 import com.example.notescl.databinding.NoteLayoutBinding
 import com.example.notescl.fragments.HomeFragmentDirections
 import com.example.notescl.model.Note
@@ -58,6 +60,11 @@ class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(),Filterable 
         holder.itemBinding.noteDesc.text=currentNote.content
         holder.itemBinding.noteDate.text=currentNote.date
 
+        currentNote.imagePath?.let { imagePath ->
+            Glide.with(holder.itemView.context)
+                .load(imagePath)
+                .into(holder.itemBinding.noteImg)
+        }
 
         holder.itemView.setOnClickListener{
             val direction=HomeFragmentDirections.actionHomeFragmentToEditNoteFragment(currentNote)
@@ -88,7 +95,6 @@ class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(),Filterable 
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 differ.submitList(results?.values as List<Note>)
-                notifyDataSetChanged()
             }
         }
     }

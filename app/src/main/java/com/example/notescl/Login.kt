@@ -42,7 +42,7 @@ class Login : AppCompatActivity() {
                 auth.signInWithEmailAndPassword(email,password).addOnCompleteListener {
                     if(it.isSuccessful){
                         Toast.makeText(this,"Successfully Login", Toast.LENGTH_SHORT).show()
-                         //noteViewModel.retrieveUserNotes()
+                         noteViewModel.retrieveUserNotes()
 
                         val intent= Intent(this,MainActivity::class.java)
                         startActivity(intent)

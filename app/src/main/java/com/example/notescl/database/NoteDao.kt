@@ -10,10 +10,8 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.example.notescl.model.Note
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
-import java.util.UUID
 
 @Dao
 interface NoteDao {
@@ -51,12 +49,13 @@ interface NoteDao {
                 val title = document.getString("title") ?: ""
                 val content = document.getString("content") ?: ""
                 val date = document.getString("date") ?: ""
+                val imagePath = document.getString("imagePath") ?: ""
 
 
-                val noteId = document.id.hashCode()
+                val noteId = document.id
 
                 val note =
-                    Note(noteId, title, content, date, userId)
+                    Note(noteId, title, content, date, userId,imagePath)
                  userNotes.add(note)
             }
             insertNotes(userNotes)
