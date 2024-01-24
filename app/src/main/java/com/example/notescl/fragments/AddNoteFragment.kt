@@ -54,14 +54,15 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
     private val cameraPermissionRequestCode = 101
     private val galleryPermissionRequestCode = 102
     private val captureImageRequestCode = 103
+
     private val pickImageRequestCode = 104
+    private lateinit var selectedImageUri: Uri
 
     private val READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 102
 
     private lateinit var userId: String
     private lateinit var dbFirestore: FirebaseFirestore
 
-    private var selectedImageUri: Uri? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -95,8 +96,8 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
             lifecycleScope.launch {
                 try {
                     var imageUrl = ""
-                    if (selectedImageUri != null) {
-                        imageUrl = uploadImageToStorage(selectedImageUri!!, userId, "note_image_${System.currentTimeMillis()}")
+                    if (::selectedImageUri.isInitialized) {
+                        imageUrl = uploadImageToStorage(selectedImageUri, userId, "note_image_${System.currentTimeMillis()}")
                         if (imageUrl.isEmpty()) {
                             Toast.makeText(addNoteView.context, "Error uploading image", Toast.LENGTH_SHORT).show()
                             return@launch
@@ -109,14 +110,15 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
                     Toast.makeText(addNoteView.context, "Note Saved", Toast.LENGTH_SHORT).show()
                     view.findNavController().popBackStack(R.id.homeFragment, false)
                 } catch (e: Exception) {
-                    Log.e("Firestore", "Error: ${e.message}", e)
-                    Toast.makeText(addNoteView.context, "Error saving note", Toast.LENGTH_SHORT).show()
+                    Log.e("Firestore", "Error saving note", e)
+                    Toast.makeText(addNoteView.context, "Error saving note: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         } else {
             Toast.makeText(addNoteView.context, "Please write a Note title", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
       menu.clear()
@@ -240,15 +242,14 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
             }
             pickImageRequestCode -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
-                    currentPhotoPath = getImagePathFromUri(data.data)
-                    Log.d("AddNoteFragment", "Selected Image Uri: $currentPhotoPath")
-                    loadImageIntoImageView(data.data)
+                    selectedImageUri = data.data!!
+                    loadImageIntoImageView(selectedImageUri)
                 }
             }
         }
     }
 
-    private fun getImagePathFromUri(uri: Uri?): String? {
+    /*private fun getImagePathFromUri(uri: Uri?): String? {
         var path: String? = null
         val projection = arrayOf(MediaStore.Images.Media.DATA)
         val cursor = requireContext().contentResolver.query(uri!!, projection, null, null, null)
@@ -259,7 +260,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
             cursor.close()
         }
         return path
-    }
+    }*/
 
 
     private fun loadImageIntoImageView(imageUri: Uri?) {

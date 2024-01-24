@@ -94,6 +94,10 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
         binding.editNoteDesc.setText(currentNote.content)
         binding.updateNoteDate.setText(currentNote.date)
 
+        if (currentNote.imageUrl?.isNotEmpty() == true) {
+            loadImageIntoImageView(Uri.parse(currentNote.imageUrl))
+        }
+
         binding.editNoteFab.setOnClickListener {
             val noteTitle = binding.editNoteTitle.text.toString().trim()
             val noteContent = binding.editNoteDesc.text.toString().trim()
@@ -105,23 +109,21 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
             val userId = user?.uid
 
             if (noteTitle.isNotEmpty()) {
-                val note = Note(
-                    "0",
-                    noteTitle,
-                    noteContent,
-                    notesDate.toString(),
-                    userId,
-                    imageUrl
-                )
-                noteViewModel.updateNote(note)
+                currentNote.title = noteTitle
+                currentNote.content = noteContent
+                currentNote.date = notesDate.toString()
 
                 currentPhotoPath?.let { path ->
                     if (userId != null) {
                         lifecycleScope.launch {
                             try {
-                                val imageUrl = uploadImageAndStoreInFirestore(note.id, path)
+                                val imageUrl = uploadImageAndStoreInFirestore(currentNote.id, path)
                                 val updatedImageUrl = imageUploadDeferred.await()
-                                updateNoteInFirestore(note, updatedImageUrl)
+
+                                currentNote.imageUrl = updatedImageUrl
+
+                                noteViewModel.updateNote(currentNote)
+                                updateNoteInFirestore(currentNote, updatedImageUrl)
 
                             } catch (e: Exception) {
                                 Log.e("Firestore", "Error uploading image: ${e.message}", e)
@@ -142,6 +144,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
             }
         }
     }
+
 
         private fun deleteNote(){
         AlertDialog.Builder(activity).apply {
@@ -177,26 +180,17 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
     private fun showImageSelectionDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
 
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setTitle("Select an Option")
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> checkCameraPermission()
-                    1 -> {
-                        if (ContextCompat.checkSelfPermission(
-                                requireContext(),
-                                Manifest.permission.READ_EXTERNAL_STORAGE
-                            ) == PackageManager.PERMISSION_GRANTED
-                        ) {
-                            dispatchPickImageIntent()
-                        } else {
-                            requestStoragePermission()
-                        }
-                    }
+                    1 -> checkGalleryPermission()
                 }
             }
             .show()
     }
+
     private fun requestStoragePermission() {
         ActivityCompat.requestPermissions(
             requireActivity(),
@@ -221,20 +215,12 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
     }
 
     private fun checkGalleryPermission() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            dispatchPickImageIntent()
-        } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                galleryPermissionRequestCode
-            )
+        val galleryIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+            type = "image/*"
         }
+        startActivityForResult(galleryIntent, pickImageRequestCode)
     }
+
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             takePictureIntent.resolveActivity(requireContext().packageManager)?.also {
@@ -273,6 +259,7 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
         }
         startActivityForResult(pickImageIntent, pickImageRequestCode)
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -303,10 +290,31 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
                     loadImageIntoImageView(Uri.fromFile(File(currentPhotoPath)))
                 }
             }
+
             pickImageRequestCode -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     currentPhotoPath = data.data?.path
                     loadImageIntoImageView(data.data)
+
+                    if (currentPhotoPath != null) {
+                        lifecycleScope.launch {
+                            try {
+                                val imageUrl = uploadImageAndStoreInFirestore(
+                                    currentNote.id,
+                                    currentPhotoPath!!
+                                )
+                                val updatedImageUrl = imageUploadDeferred.await()
+                                updateNoteInFirestore(currentNote, updatedImageUrl)
+                            } catch (e: Exception) {
+                                Log.e("Firestore", "Error uploading image: ${e.message}", e)
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Error uploading image",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -355,7 +363,8 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
             val imageUrl = imageRef.downloadUrl.await().toString()
             this@EditNoteFragment.imageUrl = imageUrl
             imageUploadDeferred.complete(imageUrl)
-            imageUrl
+            loadImageIntoImageView(Uri.parse(imageUrl))
+            return imageUrl
         } else {
             ""
         }

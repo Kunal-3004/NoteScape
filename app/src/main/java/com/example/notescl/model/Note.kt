@@ -12,9 +12,9 @@ import java.util.UUID
 data class Note(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val title:String,
-    val content:String,
-    val date:String,
+    var title:String,
+    var content:String,
+    var date:String,
     val userId: String?,
     var imageUrl: String?
 ):Parcelable
