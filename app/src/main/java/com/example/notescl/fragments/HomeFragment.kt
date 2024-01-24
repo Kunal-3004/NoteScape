@@ -16,9 +16,11 @@ import android.widget.Filterable
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.bumptech.glide.Glide
 import com.example.notescl.Login
 import com.example.notescl.MainActivity
 import com.example.notescl.R
@@ -67,6 +69,7 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
             val userId = user.uid
             noteViewModel.retrieveAndPopulateUserNotes(userId)
         }
+
 
 
         binding.addNoteFab.setOnClickListener {

@@ -55,6 +55,11 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
         _notes.value = notesList
     }
 
+    suspend fun getNoteById(noteId: String): Note {
+        return noteRepository.getNoteById(noteId)
+    }
+
+
     fun updateNoteInFirestore(note: Note) = viewModelScope.launch {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {

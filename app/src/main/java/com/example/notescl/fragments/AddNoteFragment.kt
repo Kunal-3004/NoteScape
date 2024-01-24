@@ -52,7 +52,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
 
     private var currentPhotoPath: String? = null
     private val cameraPermissionRequestCode = 101
-    private val galleryPermissionRequestCode = 102
     private val captureImageRequestCode = 103
 
     private val pickImageRequestCode = 104

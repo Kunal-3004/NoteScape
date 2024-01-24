@@ -22,6 +22,11 @@ class NoteRepository(context: Context) {
     fun getAllNotes() = noteDao.getAllNotes()
     fun searchNote(query: String?) = noteDao.searchNote("%$query%")
 
+    suspend fun getNoteById(noteId: String): Note {
+        return noteDao.getNoteById(noteId)
+    }
+
+
     suspend fun retrieveUserNotesFromFirestore(userId: String) {
         noteDao.retrieveUserNotesFromFirestore(userId)
     }
