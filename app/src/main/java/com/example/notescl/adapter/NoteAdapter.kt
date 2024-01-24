@@ -2,6 +2,7 @@ package com.example.notescl.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Filter
 import android.widget.Filterable
@@ -60,11 +61,15 @@ class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(),Filterable 
         holder.itemBinding.noteDesc.text=currentNote.content
         holder.itemBinding.noteDate.text=currentNote.date
 
-        currentNote.imagePath?.let { imagePath ->
+        if (!currentNote.imageUrl.isNullOrBlank()) {
             Glide.with(holder.itemView.context)
-                .load(imagePath)
+                .load(currentNote.imageUrl)
                 .into(holder.itemBinding.noteImg)
+            holder.itemBinding.noteImg.visibility = View.VISIBLE
+        } else {
+            holder.itemBinding.noteImg.visibility = View.GONE
         }
+
 
         holder.itemView.setOnClickListener{
             val direction=HomeFragmentDirections.actionHomeFragmentToEditNoteFragment(currentNote)

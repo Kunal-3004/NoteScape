@@ -16,5 +16,5 @@ data class Note(
     val content:String,
     val date:String,
     val userId: String?,
-    var imagePath: String?
+    var imageUrl: String?
 ):Parcelable

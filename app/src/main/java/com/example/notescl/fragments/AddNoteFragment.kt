@@ -61,15 +61,14 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
     private lateinit var userId: String
     private lateinit var dbFirestore: FirebaseFirestore
 
+    private var selectedImageUri: Uri? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
        addNoteBinding=FragmentAddNoteBinding.inflate(inflater,container,false)
         return binding.root
-
-
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -93,42 +92,41 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         val userId = user?.uid
 
         if (noteTitle.isNotEmpty()) {
-            val note =
-                Note("0", noteTitle, noteContent, notesDate.toString(), userId, currentPhotoPath)
-
             lifecycleScope.launch {
-                noteViewModel.addNote(note)
-
-                currentPhotoPath?.let { path ->
-
-                    if (userId!=null) {
-                        val imageUrl = uploadImageToStorage(path, userId, note.id)
-                        if (imageUrl.isNotEmpty()) {
-                            updateImageUrlInFirestore(note.id, imageUrl)
+                try {
+                    var imageUrl = ""
+                    if (selectedImageUri != null) {
+                        imageUrl = uploadImageToStorage(selectedImageUri!!, userId, "note_image_${System.currentTimeMillis()}")
+                        if (imageUrl.isEmpty()) {
+                            Toast.makeText(addNoteView.context, "Error uploading image", Toast.LENGTH_SHORT).show()
+                            return@launch
                         }
                     }
-                }
+
+                    val note = Note("0", noteTitle, noteContent, notesDate.toString(), userId, imageUrl)
+                    addNoteToFirestore(note)
 
                     Toast.makeText(addNoteView.context, "Note Saved", Toast.LENGTH_SHORT).show()
                     view.findNavController().popBackStack(R.id.homeFragment, false)
+                } catch (e: Exception) {
+                    Log.e("Firestore", "Error: ${e.message}", e)
+                    Toast.makeText(addNoteView.context, "Error saving note", Toast.LENGTH_SHORT).show()
+                }
             }
-        }
-             else{
+        } else {
             Toast.makeText(addNoteView.context, "Please write a Note title", Toast.LENGTH_SHORT).show()
         }
     }
-
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
       menu.clear()
         menuInflater.inflate(R.menu.addnote_menu,menu)
     }
-
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return when(menuItem.itemId){
             R.id.Save_menu->{
                 saveNote(addNoteView)
-                addNoteToFirestore()
+                //addNoteToFirestore()
                 true
             }
             R.id.addImage->{
@@ -138,7 +136,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
             else->false
         }
     }
-
     private fun showImageSelectionDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
 
@@ -153,13 +150,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
             .show()
     }
 
-    private fun requestStoragePermission() {
-        ActivityCompat.requestPermissions(
-            requireActivity(),
-            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-            READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE
-        )
-    }
     private fun checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -176,21 +166,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         }
     }
 
-    private fun checkGalleryPermission() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            dispatchPickImageIntent()
-        } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                galleryPermissionRequestCode
-            )
-        }
-    }
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             takePictureIntent.resolveActivity(requireContext().packageManager)?.also {
@@ -206,12 +181,14 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
                         "${requireContext().packageName}.fileprovider",
                         it
                     )
+                    currentPhotoPath = it.absolutePath
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
                     startActivityForResult(takePictureIntent, captureImageRequestCode)
                 }
             }
         }
     }
+
 
     private fun createImageFile(): File {
         val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -263,11 +240,25 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
             }
             pickImageRequestCode -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
-                    val selectedImageUri: Uri? = data.data
-                    loadImageIntoImageView(selectedImageUri)
+                    currentPhotoPath = getImagePathFromUri(data.data)
+                    Log.d("AddNoteFragment", "Selected Image Uri: $currentPhotoPath")
+                    loadImageIntoImageView(data.data)
                 }
             }
         }
+    }
+
+    private fun getImagePathFromUri(uri: Uri?): String? {
+        var path: String? = null
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = requireContext().contentResolver.query(uri!!, projection, null, null, null)
+        if (cursor != null) {
+            val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+            cursor.moveToFirst()
+            path = cursor.getString(columnIndex)
+            cursor.close()
+        }
+        return path
     }
 
 
@@ -279,83 +270,41 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
             binding.imgNote.visibility = View.VISIBLE
         }
     }
+    private fun addNoteToFirestore(note: Note) {
+        val noteMap = mapOf(
+            "title" to note.title,
+            "content" to note.content,
+            "date" to note.date,
+            "userId" to note.userId,
+            "imageUrl" to note.imageUrl
+        )
 
-
-    private fun addNoteToFirestore() {
-        val noteTitle = binding.addNoteTitle.text.toString().trim()
-        val noteContent = binding.addNoteDesc.text.toString().trim()
-        val d = Date()
-        val notesDate: CharSequence = android.text.format.DateFormat.format("MMMM d,yyyy", d.time)
-
-        if (noteTitle.isNotEmpty()) {
-            val user = FirebaseAuth.getInstance().currentUser
-            val userId = user?.uid
-            if (userId != null) {
-                val noteMap = mapOf(
-                    "title" to noteTitle,
-                    "content" to noteContent,
-                    "date" to notesDate.toString(),
-                    "userId" to userId
-                )
-                val dbFireStore = FirebaseFirestore.getInstance()
-                dbFireStore.collection("notes")
-                    .add(noteMap)
-                    .addOnSuccessListener { documentReference ->
-                        Log.d(
-                            "Firestore",
-                            "Note added successfully. Document ID: ${documentReference.id}"
-                        )
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("Firestore", "Error adding note to Firestore: ${e.message}", e)
-                    }
+        val dbFirestore = FirebaseFirestore.getInstance()
+        dbFirestore.collection("notes")
+            .add(noteMap)
+            .addOnSuccessListener { documentReference ->
+                Log.d("Firestore", "Note added successfully. Document ID: ${documentReference.id}")
             }
-        }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "Error adding note to Firestore: ${e.message}", e)
+            }
     }
 
-    private fun uploadImageToStorage(imagePath: String, userId: String, noteId: String): String {
-        val storageReference = FirebaseStorage.getInstance().reference
-        val imageRef = storageReference.child("images/$userId/$noteId.jpg")
+    private suspend fun uploadImageToStorage(imageUri: Uri, userId: String?, noteId: String): String {
+        return try {
+            val storageReference = FirebaseStorage.getInstance().reference
+            val imageRef = storageReference.child("images/$userId/$noteId.jpg")
 
-        try {
-            val imageByteArray = convertImageToByteArray(imagePath)
+            val uploadTask = imageRef.putFile(imageUri)
+            val taskSnapshot = uploadTask.await()
 
-            val uploadTask = imageRef.putBytes(imageByteArray)
-            uploadTask.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    imageRef.downloadUrl.addOnCompleteListener { uriTask ->
-                        if (uriTask.isSuccessful) {
-                            val imageUrl = uriTask.result.toString()
-                            imageUrl
-                        } else {
-                            Log.e("Firestore", "Error getting download URL: ${uriTask.exception?.message}", uriTask.exception)
-                            ""
-                        }
-                    }
-                } else {
-                    Log.e("Firestore", "Image upload failed with error: ${task.exception?.message}", task.exception)
-                    ""
-                }
-            }
+            val downloadUrl = taskSnapshot.storage.downloadUrl.await().toString()
+            downloadUrl
         } catch (e: Exception) {
             Log.e("Firestore", "Error uploading image to Firebase Storage: ${e.message}", e)
-            ""
+            throw e
         }
-        return ""
     }
-    private fun convertImageToByteArray(imagePath: String): ByteArray {
-        val file = File(imagePath)
-        return file.readBytes()
-    }
-
-    private fun updateImageUrlInFirestore(noteId: String, imageUrl: String) {
-            val noteDocument = dbFirestore.collection("notes").document(noteId)
-            noteDocument.update("imageUrl", imageUrl)
-                .addOnSuccessListener {
-                }
-                .addOnFailureListener { e ->
-                }
-        }
 
     override fun onDestroy() {
         super.onDestroy()

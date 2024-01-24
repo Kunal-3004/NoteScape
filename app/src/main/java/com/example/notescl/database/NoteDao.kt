@@ -49,13 +49,14 @@ interface NoteDao {
                 val title = document.getString("title") ?: ""
                 val content = document.getString("content") ?: ""
                 val date = document.getString("date") ?: ""
-                val imagePath = document.getString("imagePath") ?: ""
+                val imageUrl = document.getString("imageUrl") ?: ""
+
 
 
                 val noteId = document.id
 
                 val note =
-                    Note(noteId, title, content, date, userId,imagePath)
+                    Note(noteId, title, content, date, userId,imageUrl)
                  userNotes.add(note)
             }
             insertNotes(userNotes)

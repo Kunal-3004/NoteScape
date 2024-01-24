@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileInputStream
+import java.io.IOException
 
 
 class NoteViewModel(application: Application, noteRepository: NoteRepository) : AndroidViewModel(application) {
@@ -53,8 +55,6 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
         _notes.value = notesList
     }
 
-
-
     fun updateNoteInFirestore(note: Note) = viewModelScope.launch {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
@@ -68,8 +68,7 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
                             "title" to note.title,
                             "content" to note.content,
                             "date" to note.date,
-                            "userId" to note.userId,
-                            "imagePath" to note.imagePath
+                            "userId" to note.userId
                         )
 
                         noteDocument
@@ -90,8 +89,6 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
         }
     }
 
-
-
     private var isFirestoreRetrieved = false
 
     fun  retrieveUserNotes(){
@@ -109,7 +106,8 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
                         val content = document.getString("content")
                         val date = document.getString("date")
                         val documentUserId = document.getString("userId")
-                        val imagePath = document.getString("imagePath")
+                        val imageUrl = document.getString("imageUrl")
+
 
                         val note = Note(
                             noteId?:"",
@@ -117,7 +115,7 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
                             content ?: "",
                             date ?: "",
                             documentUserId,
-                            imagePath
+                            imageUrl = imageUrl ?: ""
                         )
                         userNotes.add(note)
                     }
@@ -131,22 +129,12 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
         }
     }
 
-    fun retrieveAndPopulateUserNotes(userId: String) = viewModelScope.launch {
-        noteRepository.retrieveUserNotesFromFirestore(userId)
-        val allNotesObserver = Observer<List<Note>> { notesList ->
-            setNotes(notesList)
-        }
-
-        withContext(Dispatchers.Main) {
-            noteRepository.getAllNotes().observeForever(allNotesObserver)
+    fun retrieveAndPopulateUserNotes(userId: String) {
+        viewModelScope.launch {
+            noteRepository.retrieveUserNotesFromFirestore(userId)
         }
     }
 
-    /*fun deleteNoteAndFirestore(note: Note) {
-        viewModelScope.launch {
-            noteRepository.deleteNoteAndFirestore(note)
-        }
-    }*/
     fun deleteNoteFromFirestore(noteId: String) {
         val notesCollection = dbFireStore.collection("notes")
         val noteDocument = notesCollection.document(noteId)
@@ -161,3 +149,4 @@ class NoteViewModel(application: Application, noteRepository: NoteRepository) : 
     }
 
 }
+
