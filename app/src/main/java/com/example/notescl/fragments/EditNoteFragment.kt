@@ -109,42 +109,25 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
             val notesDate: CharSequence =
                 android.text.format.DateFormat.format("MMMM d,yyyy", d.time)
 
-
             if (noteTitle.isNotEmpty()) {
-                currentNote.title = noteTitle
-                currentNote.content = noteContent
-                currentNote.date = notesDate.toString()
+                val updatedNote = currentNote.copy()
 
-                currentPhotoPath?.let { path ->
-                    if (currentNote.id.isNotEmpty()) {
-                        lifecycleScope.launchWhenResumed{
-                            try {
+                updatedNote.title = noteTitle
+                updatedNote.content = noteContent
+                updatedNote.date = notesDate.toString()
 
-                                val updatedImageUrl = imageUploadDeferred.await()
+                lifecycleScope.launchWhenResumed {
+                    try {
+                        if (currentPhotoPath != null) {
+                            val updatedImageUrl = uploadImageAndStoreInFirestore(
+                                updatedNote.id,
+                                currentPhotoPath!!
+                            )
 
-                                if (!updatedImageUrl.isNullOrEmpty()) {
-                                    currentNote.imageUrl = updatedImageUrl
-
-                                    noteViewModel.updateNote(currentNote)
-                                    val updatedNote = noteViewModel.getNoteById(currentNote.id)
-                                    refreshUI(updatedNote)
-                                    updateNoteInFirestore(currentNote, updatedImageUrl)
-
-                                    view?.findNavController()
-                                        ?.popBackStack(R.id.homeFragment, false)
-                                } else {
-                                    Log.e(
-                                        "Firestore",
-                                        "Empty or null imageUrl after uploading image"
-                                    )
-                                    Toast.makeText(
-                                        requireContext(),
-                                        "Error uploading image",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            } catch (e: Exception) {
-                                Log.e("Firestore", "Error uploading image: ${e.message}", e)
+                            if (!updatedImageUrl.isNullOrEmpty()) {
+                                updatedNote.imageUrl = updatedImageUrl
+                            } else {
+                                Log.e("Firestore", "Empty or null imageUrl after uploading image")
                                 Toast.makeText(
                                     requireContext(),
                                     "Error uploading image",
@@ -152,6 +135,20 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
                                 ).show()
                             }
                         }
+                        noteViewModel.updateNote(updatedNote)
+                        updateNoteInFirestore(updatedNote, updatedNote.imageUrl)
+
+                        refreshUI(updatedNote)
+
+                        view?.findNavController()?.popBackStack(R.id.homeFragment, false)
+
+                    } catch (e: Exception) {
+                        Log.e("Firestore", "Error updating note: ${e.message}", e)
+                        Toast.makeText(
+                            requireContext(),
+                            "Error updating note",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
