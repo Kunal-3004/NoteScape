@@ -53,7 +53,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
     private var currentPhotoPath: String? = null
     private val cameraPermissionRequestCode = 101
     private val captureImageRequestCode = 103
-
     private val pickImageRequestCode = 104
     private lateinit var selectedImageUri: Uri
 
@@ -127,7 +126,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         return when(menuItem.itemId){
             R.id.Save_menu->{
                 saveNote(addNoteView)
-                //addNoteToFirestore()
                 true
             }
             R.id.addImage->{
@@ -190,7 +188,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
         }
     }
 
-
     private fun createImageFile(): File {
         val storageDir: File? = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(
@@ -247,21 +244,6 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note),MenuProvider {
             }
         }
     }
-
-    /*private fun getImagePathFromUri(uri: Uri?): String? {
-        var path: String? = null
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = requireContext().contentResolver.query(uri!!, projection, null, null, null)
-        if (cursor != null) {
-            val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToFirst()
-            path = cursor.getString(columnIndex)
-            cursor.close()
-        }
-        return path
-    }*/
-
-
     private fun loadImageIntoImageView(imageUri: Uri?) {
         imageUri?.let {
             Glide.with(requireContext())

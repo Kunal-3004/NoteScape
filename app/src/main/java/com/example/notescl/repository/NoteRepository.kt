@@ -31,16 +31,4 @@ class NoteRepository(context: Context) {
         noteDao.retrieveUserNotesFromFirestore(userId)
     }
 
-     suspend fun deleteNoteFromFirestore(noteId: String) {
-         val notesCollection = firestore.collection("notes")
-         val noteDocument = notesCollection.document(noteId)
-
-         try {
-             noteDocument.delete().await()
-             Log.d("Firestore", "DocumentSnapshot successfully deleted!")
-         } catch (e: Exception) {
-             Log.w("Firestore", "Error deleting document", e)
-         }
-     }
-
 }

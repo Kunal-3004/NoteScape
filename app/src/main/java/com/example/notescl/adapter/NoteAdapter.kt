@@ -23,9 +23,6 @@ class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(),Filterable 
 
     private var originalList: List<Note> = mutableListOf()
 
-
-
-
     class NoteViewHolder(val itemBinding:NoteLayoutBinding):RecyclerView.ViewHolder(itemBinding.root)
 
 
@@ -92,12 +89,10 @@ class NoteAdapter:RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(),Filterable 
                         it.title.contains(constraint, true) || it.content.contains(constraint, true)
                     }
                 }
-
                 val results = FilterResults()
                 results.values = filteredResults
                 return results
             }
-
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
                 differ.submitList(results?.values as List<Note>)
             }

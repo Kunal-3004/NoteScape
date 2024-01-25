@@ -63,14 +63,11 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
 
         noteViewModel = (activity as MainActivity).noteViewModel
         setupRecyclerView()
-        //noteViewModel.retrieveUserNotes()
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
             val userId = user.uid
             noteViewModel.retrieveAndPopulateUserNotes(userId)
         }
-
-
 
         binding.addNoteFab.setOnClickListener {
             it.findNavController().navigate(R.id.action_homeFragment_to_addNoteFragment)
@@ -87,7 +84,6 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
                 binding.homeRecyclerView.visibility = View.GONE
             }
         }
-
     }
 
     private fun setupRecyclerView() {
@@ -104,16 +100,6 @@ class HomeFragment : Fragment(R.layout.fragment_home),SearchView.OnQueryTextList
                 updateUI(note)
             }
         }
-    }
-
-    private fun searchNote(query: String?) {
-        val searchQuery = "%$query"
-        val filteredList = if (query.isNullOrBlank()) {
-            noteAdapter.differ.currentList
-        } else {
-            noteViewModel.searchNotes(searchQuery).value ?: emptyList()
-        }
-        noteAdapter.submitListAndFilter(filteredList)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {

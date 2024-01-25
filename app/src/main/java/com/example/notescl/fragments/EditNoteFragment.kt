@@ -65,7 +65,6 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
     private val pickImageRequestCode = 104
     private val READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 102
 
-    private lateinit var userId: String
     private lateinit var dbFirestore: FirebaseFirestore
     private val args: EditNoteFragmentArgs by navArgs()
 
@@ -110,8 +109,6 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note),MenuProvider {
             val notesDate: CharSequence =
                 android.text.format.DateFormat.format("MMMM d,yyyy", d.time)
 
-            val user = FirebaseAuth.getInstance().currentUser
-            val userId = user?.uid
 
             if (noteTitle.isNotEmpty()) {
                 currentNote.title = noteTitle
